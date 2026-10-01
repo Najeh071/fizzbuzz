@@ -34,5 +34,20 @@ func Compute(req Request) ([]string, error) {
 	//construction de résultat et slices de la liste
 	res := make([]string, 0, req.Limit)
 
+	for i := 1; i <= req.Limit; i++ {
+		multiple1 := i%req.Int1 == 0
+		multiple2 := i%req.Int2 == 0
+
+		if multiple1 && multiple2 {
+			res = append(res, req.Str1+req.Str2)
+		} else if multiple1 {
+			res = append(res, req.Str1)
+		} else if multiple2 {
+			res = append(res, req.Str2)
+		} else {
+			res = append(res, strconv.Itoa(i))
+		}
+	}
+
 	return res, nil
 }
