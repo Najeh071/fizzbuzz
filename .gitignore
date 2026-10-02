@@ -1,0 +1,5 @@
+*.pdf
+*.db
+*.db-shm
+*.db-wal
+*.txt

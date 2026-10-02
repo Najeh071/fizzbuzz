@@ -14,6 +14,20 @@ import (
 	"fizz-buzz/internal/handler"
 )
 
+const Version = "v0.1.0"
+const Author = "Najeh Abassi"
+
+func setupRouter(database *db.DB) http.Handler  {
+	h := handler.NewHTTPHandler(database)
+	mux := http.NewServeMux()
+
+	// Used when calling with curl but passing params as string exemple ?int1=3&int2=6..
+	mux.HandleFunc("GET /api/v1/fizzbuzz", h.HandleFizzBuzzQuery)
+	mux.HandleFunc("GET /api/v1/stats", h.HandleStats)
+
+	return mux
+}
+
 func main() {
 	// Initialisation de base de donnée pour utilisation des rapports et statistique
 	database, err := db.InitDB("fizzbuzz.db")
@@ -23,16 +37,12 @@ func main() {
 	}
 	defer database.Close()
 
-	h := handler.NewHTTPHandler(database)
-
-	mux := http.NewServeMux()
-	mux.HandleFunc("POST /api/v1/fizzbuzz", h.HandleFizzBuzz)
-	mux.HandleFunc("GET /api/v1/fizzbuzz", h.HandleFizzBuzzQuery)
-	mux.HandleFunc("GET /api/v1/stats", h.HandleStats)
+	// Used when calling with curl post and providing json params for testing only to be removed
+	//mux.HandleFunc("POST /api/v1/fizzbuzz", h.HandleFizzBuzz)
 
 	server := &http.Server{
 		Addr:         ":8081",
-		Handler:      mux,
+		Handler:      setupRouter(database),
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  120 * time.Second,
@@ -56,4 +66,6 @@ func main() {
 	if err := server.Shutdown(ctx); err != nil {
 		slog.Error("Server forced shutdown", "error", err)
 	}
+
+
 }

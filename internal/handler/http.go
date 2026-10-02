@@ -72,6 +72,12 @@ func (h *HTTPHandler) HandleFizzBuzzQuery(w http.ResponseWriter, r *http.Request
 func (h *HTTPHandler) HandleStats(w http.ResponseWriter, r *http.Request) {
 	stat, err := h.database.GetMostFrequent(r.Context())
 
+	//when testing the db is null so this function need a test not directly related to the code.
+	if h.database == nil {
+		w.WriteHeader(http.StatusServiceUnavailable)
+		json.NewEncoder(w).Encode(map[string]string{"error" : "Database does not exist"})
+	}
+
 	if err != nil {
 		slog.Error("failed to query stats", "error", err)
 		writeJSONError(w, "Internal server error", http.StatusInternalServerError)

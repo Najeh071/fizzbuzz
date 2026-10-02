@@ -3,11 +3,11 @@ package db
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	// Enregistre silencieusement le driver SQLite dans database/sql
 	_ "modernc.org/sqlite"
-
 	"fizz-buzz/pkg/fizzbuzz"
 )
 
@@ -75,6 +75,11 @@ func (d *DB) TrackRequest(ctx context.Context, req fizzbuzz.Request) error {
 
 // fonction pour l'utilisation plus tard pour les statestiques.
 func (d *DB) GetMostFrequent(ctx context.Context) (*StatRecord, error) {
+
+	if d == nil || d.conn == nil {
+		return nil, errors.New("database connection is null")
+	}
+
 	query := `
 	SELECT int1, int2, fizz_limit, str1, str2, hits
 	FROM request_stats
